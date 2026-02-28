@@ -95,8 +95,8 @@ jobs:
           Section: devel
           Priority: optional
           Architecture: ${ARCH}
-          Maintainer: MadOrange4 <github.com/MadOrange4>
-          Homepage: https://github.com/MadOrange4/vitals
+          Maintainer: onuroluc <github.com/onuroluc>
+          Homepage: https://github.com/onuroluc/vitals
           Description: Universal development environment doctor
            Auto-detects your project stack (Node.js, Python, Rust, Go, Ruby, Java)
            and diagnoses issues: runtime versions, dependencies, Docker services,
@@ -132,7 +132,7 @@ jobs:
           Release:        1
           Summary:        Universal development environment doctor
           License:        MIT
-          URL:            https://github.com/MadOrange4/vitals
+          URL:            https://github.com/onuroluc/vitals
           AutoReqProv:    no
 
           %description
@@ -210,7 +210,7 @@ jobs:
         run: |
           VERSION=${{ steps.version.outputs.version }}
           TAG=${GITHUB_REF_NAME}
-          BASE="https://github.com/MadOrange4/vitals/releases/download/${TAG}"
+          BASE="https://github.com/onuroluc/vitals/releases/download/${TAG}"
 
           curl -sSL "${BASE}/vitals-darwin-arm64.tar.gz" -o darwin-arm64.tar.gz
           curl -sSL "${BASE}/vitals-darwin-amd64.tar.gz" -o darwin-amd64.tar.gz
@@ -226,7 +226,7 @@ jobs:
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
-          repository: MadOrange4/homebrew-tap
+          repository: onuroluc/homebrew-tap
           event-type: update-formula
           client-payload: |
             {

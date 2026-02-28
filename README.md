@@ -6,7 +6,7 @@
 
 Auto-detects your project stack and diagnoses issues before they waste your time
 
-[![CI](https://github.com/MadOrange4/vitals/actions/workflows/ci.yml/badge.svg)](https://github.com/MadOrange4/vitals/actions)
+[![CI](https://github.com/onuroluc/vitals/actions/workflows/ci.yml/badge.svg)](https://github.com/onuroluc/vitals/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Rust](https://img.shields.io/badge/Rust-2021-orange.svg)](https://www.rust-lang.org/)
 
@@ -83,13 +83,13 @@ Every failure tells you **exactly** what to run to fix it.
 ### Quick install (recommended)
 
 ```bash
-curl -sSfL https://raw.githubusercontent.com/MadOrange4/vitals/main/install.sh | sh
+curl -sSfL https://raw.githubusercontent.com/onuroluc/vitals/main/install.sh | sh
 ```
 
 ### Homebrew (macOS & Linux)
 
 ```bash
-brew tap MadOrange4/tap
+brew tap onuroluc/tap
 brew install vitals
 ```
 
@@ -97,7 +97,7 @@ brew install vitals
 
 ```bash
 # Download the latest .deb (amd64)
-curl -sSLO https://github.com/MadOrange4/vitals/releases/latest/download/vitals_0.1.0_amd64.deb
+curl -sSLO https://github.com/onuroluc/vitals/releases/latest/download/vitals_0.1.0_amd64.deb
 sudo dpkg -i vitals_0.1.0_amd64.deb
 ```
 
@@ -105,7 +105,7 @@ sudo dpkg -i vitals_0.1.0_amd64.deb
 
 ```bash
 # Download the latest .rpm (x86_64)
-curl -sSLO https://github.com/MadOrange4/vitals/releases/latest/download/vitals-0.1.0-1.x86_64.rpm
+curl -sSLO https://github.com/onuroluc/vitals/releases/latest/download/vitals-0.1.0-1.x86_64.rpm
 sudo rpm -i vitals-0.1.0-1.x86_64.rpm
 ```
 
@@ -118,7 +118,7 @@ cargo install vitals
 ### From source
 
 ```bash
-git clone https://github.com/MadOrange4/vitals.git
+git clone https://github.com/onuroluc/vitals.git
 cd vitals
 cargo install --path .
 ```
@@ -127,19 +127,19 @@ cargo install --path .
 
 ```bash
 # macOS ARM (Apple Silicon)
-curl -sSfL https://github.com/MadOrange4/vitals/releases/latest/download/vitals-darwin-arm64.tar.gz | tar xz
+curl -sSfL https://github.com/onuroluc/vitals/releases/latest/download/vitals-darwin-arm64.tar.gz | tar xz
 sudo mv vitals /usr/local/bin/
 
 # macOS Intel
-curl -sSfL https://github.com/MadOrange4/vitals/releases/latest/download/vitals-darwin-amd64.tar.gz | tar xz
+curl -sSfL https://github.com/onuroluc/vitals/releases/latest/download/vitals-darwin-amd64.tar.gz | tar xz
 sudo mv vitals /usr/local/bin/
 
 # Linux x86_64
-curl -sSfL https://github.com/MadOrange4/vitals/releases/latest/download/vitals-linux-amd64.tar.gz | tar xz
+curl -sSfL https://github.com/onuroluc/vitals/releases/latest/download/vitals-linux-amd64.tar.gz | tar xz
 sudo mv vitals /usr/local/bin/
 
 # Linux ARM64
-curl -sSfL https://github.com/MadOrange4/vitals/releases/latest/download/vitals-linux-arm64.tar.gz | tar xz
+curl -sSfL https://github.com/onuroluc/vitals/releases/latest/download/vitals-linux-arm64.tar.gz | tar xz
 sudo mv vitals /usr/local/bin/
 ```
 

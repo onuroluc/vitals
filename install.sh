@@ -1,8 +1,8 @@
 #!/bin/sh
-# vitals installer — https://github.com/MadOrange4/vitals
+# vitals installer — https://github.com/onuroluc/vitals
 #
 # Usage:
-#   curl -sSfL https://raw.githubusercontent.com/MadOrange4/vitals/main/install.sh | sh
+#   curl -sSfL https://raw.githubusercontent.com/onuroluc/vitals/main/install.sh | sh
 #
 # Environment variables:
 #   VITALS_VERSION  — specific version to install (default: latest)
@@ -10,7 +10,7 @@
 
 set -e
 
-REPO="MadOrange4/vitals"
+REPO="onuroluc/vitals"
 INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 
 # ── Detect platform ──────────────────────────────────────────────
