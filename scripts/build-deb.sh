@@ -37,5 +37,6 @@ elif command -v fakeroot &>/dev/null; then
 else
   dpkg-deb --build "${PKG}"
 fi
-mv "${PKG}.deb" "vitals_${VERSION}_${ARCH}.deb"
+
+echo "Created vitals_${VERSION}_${ARCH}.deb"
 echo "Built vitals_${VERSION}_${ARCH}.deb"
