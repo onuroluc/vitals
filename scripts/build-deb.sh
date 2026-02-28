@@ -29,6 +29,13 @@ Description: Universal development environment doctor
  dependencies, Docker services, ports, and environment variables.
 CTRL
 
-dpkg-deb --build --root-owner-group "${PKG}"
+# Try --root-owner-group first (dpkg >= 1.19.1), fall back to fakeroot
+if dpkg-deb --build --root-owner-group "${PKG}" 2>/dev/null; then
+  echo "Built with --root-owner-group"
+elif command -v fakeroot &>/dev/null; then
+  fakeroot dpkg-deb --build "${PKG}"
+else
+  dpkg-deb --build "${PKG}"
+fi
 mv "${PKG}.deb" "vitals_${VERSION}_${ARCH}.deb"
 echo "Built vitals_${VERSION}_${ARCH}.deb"

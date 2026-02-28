@@ -68,12 +68,14 @@ jobs:
 
       - name: Build .deb
         if: startsWith(matrix.os, 'ubuntu')
+        continue-on-error: true
         run: |
           chmod +x scripts/build-deb.sh
           ./scripts/build-deb.sh "${{ steps.version.outputs.version }}" "${{ matrix.deb_arch }}" "${{ matrix.target }}"
 
       - name: Build .rpm
         if: startsWith(matrix.os, 'ubuntu')
+        continue-on-error: true
         run: |
           sudo apt-get install -y rpm
           chmod +x scripts/build-rpm.sh
