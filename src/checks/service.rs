@@ -7,11 +7,7 @@ use crate::detect::{ProjectContext, ServiceReq};
 use crate::platform::Platform;
 use crate::version;
 
-pub fn check(
-    ctx: &ProjectContext,
-    config: &VitalsConfig,
-    platform: &Platform,
-) -> Vec<CheckResult> {
+pub fn check(ctx: &ProjectContext, config: &VitalsConfig, platform: &Platform) -> Vec<CheckResult> {
     let mut results = Vec::new();
 
     // ── Docker ──────────────────────────────────────────────────────────
@@ -39,9 +35,7 @@ pub fn check(
                     status: Status::Fail,
                     found: "not running".into(),
                     expected: "running".into(),
-                    fix: Some(
-                        "open -a Docker (macOS) or sudo systemctl start docker".into(),
-                    ),
+                    fix: Some("open -a Docker (macOS) or sudo systemctl start docker".into()),
                     details: vec![],
                 });
             } else {
@@ -63,7 +57,12 @@ pub fn check(
 
     // Merge config-defined services.
     merge_config_service(&mut service_reqs, &config.services.redis, "redis", 6379);
-    merge_config_service(&mut service_reqs, &config.services.postgres, "postgres", 5432);
+    merge_config_service(
+        &mut service_reqs,
+        &config.services.postgres,
+        "postgres",
+        5432,
+    );
     merge_config_service(&mut service_reqs, &config.services.mysql, "mysql", 3306);
     merge_config_service(&mut service_reqs, &config.services.mongo, "mongo", 27017);
 

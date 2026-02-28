@@ -10,15 +10,16 @@ pub fn print_results(results: &[CheckResult], ci: bool) -> (usize, usize) {
 
     // Banner
     println!();
-    println!("  {} {}", "vitals".bold(), "— project health check".dimmed());
+    println!(
+        "  {} {}",
+        "vitals".bold(),
+        "— project health check".dimmed()
+    );
     println!("  {}", "══════════════════════════════".dimmed());
 
     if results.is_empty() {
         println!();
-        println!(
-            "  {} No project files detected.",
-            "○".dimmed()
-        );
+        println!("  {} No project files detected.", "○".dimmed());
         println!(
             "  Run {} to create a config, or run vitals in a project directory.",
             "vitals --init".bold()

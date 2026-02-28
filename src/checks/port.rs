@@ -66,13 +66,7 @@ fn is_port_available(port: u16) -> bool {
 fn find_process_on_port(port: u16) -> Option<String> {
     let output = version::run_cmd(
         "lsof",
-        &[
-            "-i",
-            &format!(":{}", port),
-            "-sTCP:LISTEN",
-            "-P",
-            "-n",
-        ],
+        &["-i", &format!(":{}", port), "-sTCP:LISTEN", "-P", "-n"],
     )?;
     for line in output.lines().skip(1) {
         let parts: Vec<&str> = line.split_whitespace().collect();

@@ -43,11 +43,7 @@ pub fn check(ctx: &ProjectContext, config: &VitalsConfig) -> Vec<CheckResult> {
                     details: if detail.is_empty() {
                         vec![]
                     } else {
-                        detail
-                            .lines()
-                            .take(3)
-                            .map(|l| l.to_string())
-                            .collect()
+                        detail.lines().take(3).map(|l| l.to_string()).collect()
                     },
                 });
             }

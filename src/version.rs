@@ -4,23 +4,19 @@ use std::process::Command;
 
 /// Run a command and return its stdout (or stderr) as a trimmed string.
 pub fn run_cmd(name: &str, args: &[&str]) -> Option<String> {
-    Command::new(name)
-        .args(args)
-        .output()
-        .ok()
-        .and_then(|out| {
-            let stdout = String::from_utf8_lossy(&out.stdout).trim().to_string();
-            let stderr = String::from_utf8_lossy(&out.stderr).trim().to_string();
-            if out.status.success() && !stdout.is_empty() {
-                Some(stdout)
-            } else if !stderr.is_empty() {
-                Some(stderr)
-            } else if !stdout.is_empty() {
-                Some(stdout)
-            } else {
-                None
-            }
-        })
+    Command::new(name).args(args).output().ok().and_then(|out| {
+        let stdout = String::from_utf8_lossy(&out.stdout).trim().to_string();
+        let stderr = String::from_utf8_lossy(&out.stderr).trim().to_string();
+        if out.status.success() && !stdout.is_empty() {
+            Some(stdout)
+        } else if !stderr.is_empty() {
+            Some(stderr)
+        } else if !stdout.is_empty() {
+            Some(stdout)
+        } else {
+            None
+        }
+    })
 }
 
 /// Extract a version string (X.Y.Z or X.Y) from arbitrary command output.

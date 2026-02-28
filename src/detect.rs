@@ -247,11 +247,7 @@ fn detect_rust(ctx: &mut ProjectContext, dir: &Path) {
                 .and_then(|t| t.get("channel"))
                 .and_then(|v| v.as_str())
             {
-                if channel
-                    .chars()
-                    .next()
-                    .is_some_and(|c| c.is_ascii_digit())
-                {
+                if channel.chars().next().is_some_and(|c| c.is_ascii_digit()) {
                     version_req = Some(format!(">={}", channel));
                     source = "rust-toolchain.toml".to_string();
                 }
@@ -337,8 +333,7 @@ fn detect_ruby(ctx: &mut ProjectContext, dir: &Path) {
 
 fn detect_java(ctx: &mut ProjectContext, dir: &Path) {
     let has_maven = dir.join("pom.xml").exists();
-    let has_gradle =
-        dir.join("build.gradle").exists() || dir.join("build.gradle.kts").exists();
+    let has_gradle = dir.join("build.gradle").exists() || dir.join("build.gradle.kts").exists();
 
     if !has_maven && !has_gradle {
         return;

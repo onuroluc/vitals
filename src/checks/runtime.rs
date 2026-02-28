@@ -37,11 +37,7 @@ const RUNTIMES: &[RuntimeDef] = &[
     },
 ];
 
-pub fn check(
-    ctx: &ProjectContext,
-    config: &VitalsConfig,
-    platform: &Platform,
-) -> Vec<CheckResult> {
+pub fn check(ctx: &ProjectContext, config: &VitalsConfig, platform: &Platform) -> Vec<CheckResult> {
     let mut results = Vec::new();
 
     for req in &ctx.runtimes {
