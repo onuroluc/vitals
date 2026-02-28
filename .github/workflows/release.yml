@@ -94,21 +94,29 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/download-artifact@v4
         with:
           merge-multiple: true
 
       - name: List release assets
-        run: ls -lh
+        run: ls -lhR
 
       - name: Create release
         uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
           files: |
             *.tar.gz
-            *.sha256
+            *.tar.gz.sha256
             *.deb
             *.rpm
-            vitals-*
+            vitals-linux-*
+            vitals-darwin-*
           generate_release_notes: true
+          fail_on_unmatched_files: false
