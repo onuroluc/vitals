@@ -8,6 +8,9 @@ on:
 permissions:
   contents: write
 
+env:
+  APP_NAME: vitals
+
 jobs:
   build:
     name: Build ${{ matrix.target }}
@@ -18,47 +21,219 @@ jobs:
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
             name: vitals-linux-amd64
+            arch: amd64
           - target: aarch64-unknown-linux-gnu
             os: ubuntu-latest
             name: vitals-linux-arm64
+            arch: arm64
           - target: x86_64-apple-darwin
             os: macos-latest
             name: vitals-darwin-amd64
+            arch: amd64
           - target: aarch64-apple-darwin
             os: macos-latest
             name: vitals-darwin-arm64
+            arch: arm64
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
+
       - name: Install cross-compilation tools
         if: matrix.target == 'aarch64-unknown-linux-gnu'
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-aarch64-linux-gnu
           echo "CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc" >> $GITHUB_ENV
+
       - name: Build
         run: cargo build --release --target ${{ matrix.target }}
-      - name: Package
+
+      - name: Determine version
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+      # ── Tarball (all platforms) ──
+      - name: Package tarball
         run: |
-          mkdir -p dist
-          cp target/${{ matrix.target }}/release/vitals dist/${{ matrix.name }}
-          chmod +x dist/${{ matrix.name }}
+          mkdir -p staging
+          cp target/${{ matrix.target }}/release/vitals staging/
+          chmod +x staging/vitals
+          cd staging
+          tar czf ../${{ matrix.name }}.tar.gz vitals
+          cd ..
+          shasum -a 256 ${{ matrix.name }}.tar.gz > ${{ matrix.name }}.tar.gz.sha256
+
+      # ── Standalone binary (all platforms) ──
+      - name: Package binary
+        run: |
+          cp target/${{ matrix.target }}/release/vitals ${{ matrix.name }}
+          chmod +x ${{ matrix.name }}
+
+      # ── .deb package (Linux only) ──
+      - name: Build .deb
+        if: startsWith(matrix.os, 'ubuntu')
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          ARCH=${{ matrix.arch }}
+          PKG=vitals_${VERSION}_${ARCH}
+          mkdir -p ${PKG}/DEBIAN
+          mkdir -p ${PKG}/usr/bin
+          mkdir -p ${PKG}/usr/share/man/man1
+          mkdir -p ${PKG}/usr/share/doc/vitals
+
+          cp target/${{ matrix.target }}/release/vitals ${PKG}/usr/bin/
+          chmod 755 ${PKG}/usr/bin/vitals
+
+          cp LICENSE ${PKG}/usr/share/doc/vitals/copyright
+          cp README.md ${PKG}/usr/share/doc/vitals/
+
+          cat > ${PKG}/DEBIAN/control << EOF
+          Package: vitals
+          Version: ${VERSION}
+          Section: devel
+          Priority: optional
+          Architecture: ${ARCH}
+          Maintainer: MadOrange4 <github.com/MadOrange4>
+          Homepage: https://github.com/MadOrange4/vitals
+          Description: Universal development environment doctor
+           Auto-detects your project stack (Node.js, Python, Rust, Go, Ruby, Java)
+           and diagnoses issues: runtime versions, dependencies, Docker services,
+           port availability, and environment variables. Zero config needed.
+          EOF
+
+          # Fix leading spaces (dpkg requires field values not start on first line)
+          sed -i 's/^          //' ${PKG}/DEBIAN/control
+
+          dpkg-deb --build --root-owner-group ${PKG}
+          mv ${PKG}.deb vitals_${VERSION}_${ARCH}.deb
+
+      # ── .rpm package (Linux only) ──
+      - name: Build .rpm
+        if: startsWith(matrix.os, 'ubuntu')
+        run: |
+          sudo apt-get install -y rpm
+          VERSION=${{ steps.version.outputs.version }}
+          ARCH=${{ matrix.arch }}
+
+          # Map Debian arch to RPM arch
+          if [ "$ARCH" = "amd64" ]; then
+            RPM_ARCH="x86_64"
+          else
+            RPM_ARCH="aarch64"
+          fi
+
+          mkdir -p rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+
+          cat > rpmbuild/SPECS/vitals.spec << 'SPECEOF'
+          Name:           vitals
+          Version:        PLACEHOLDER_VERSION
+          Release:        1
+          Summary:        Universal development environment doctor
+          License:        MIT
+          URL:            https://github.com/MadOrange4/vitals
+          AutoReqProv:    no
+
+          %description
+          Auto-detects your project stack (Node.js, Python, Rust, Go, Ruby, Java)
+          and diagnoses issues: runtime versions, dependencies, Docker services,
+          port availability, and environment variables. Zero config needed.
+
+          %install
+          mkdir -p %{buildroot}/usr/bin
+          cp %{_sourcedir}/vitals %{buildroot}/usr/bin/vitals
+
+          %files
+          /usr/bin/vitals
+          SPECEOF
+
+          sed -i "s/PLACEHOLDER_VERSION/${VERSION}/" rpmbuild/SPECS/vitals.spec
+          sed -i 's/^          //' rpmbuild/SPECS/vitals.spec
+
+          cp target/${{ matrix.target }}/release/vitals rpmbuild/SOURCES/
+
+          rpmbuild --define "_topdir $(pwd)/rpmbuild" \
+            --define "_sourcedir $(pwd)/rpmbuild/SOURCES" \
+            --target ${RPM_ARCH} \
+            -bb rpmbuild/SPECS/vitals.spec
+
+          cp rpmbuild/RPMS/${RPM_ARCH}/*.rpm vitals-${VERSION}-1.${RPM_ARCH}.rpm
+
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}
-          path: dist/${{ matrix.name }}
+          path: |
+            ${{ matrix.name }}
+            ${{ matrix.name }}.tar.gz
+            ${{ matrix.name }}.tar.gz.sha256
+            *.deb
+            *.rpm
 
   release:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
+          merge-multiple: true
+
+      - name: List release assets
+        run: find artifacts -type f | sort
+
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/**/*
+          files: |
+            artifacts/**/*.tar.gz
+            artifacts/**/*.sha256
+            artifacts/**/*.deb
+            artifacts/**/*.rpm
+            artifacts/**/vitals-*
           generate_release_notes: true
+
+  # ── Update Homebrew tap after release ──
+  homebrew:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine version
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+      - name: Wait for release assets
+        run: sleep 15
+
+      - name: Calculate SHA256 sums
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          TAG=${GITHUB_REF_NAME}
+          BASE="https://github.com/MadOrange4/vitals/releases/download/${TAG}"
+
+          curl -sSL "${BASE}/vitals-darwin-arm64.tar.gz" -o darwin-arm64.tar.gz
+          curl -sSL "${BASE}/vitals-darwin-amd64.tar.gz" -o darwin-amd64.tar.gz
+          curl -sSL "${BASE}/vitals-linux-amd64.tar.gz" -o linux-amd64.tar.gz
+          curl -sSL "${BASE}/vitals-linux-arm64.tar.gz" -o linux-arm64.tar.gz
+
+          echo "SHA_DARWIN_ARM64=$(shasum -a 256 darwin-arm64.tar.gz | cut -d' ' -f1)" >> $GITHUB_ENV
+          echo "SHA_DARWIN_AMD64=$(shasum -a 256 darwin-amd64.tar.gz | cut -d' ' -f1)" >> $GITHUB_ENV
+          echo "SHA_LINUX_AMD64=$(shasum -a 256 linux-amd64.tar.gz | cut -d' ' -f1)" >> $GITHUB_ENV
+          echo "SHA_LINUX_ARM64=$(shasum -a 256 linux-arm64.tar.gz | cut -d' ' -f1)" >> $GITHUB_ENV
+
+      - name: Update Homebrew formula
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          repository: MadOrange4/homebrew-tap
+          event-type: update-formula
+          client-payload: |
+            {
+              "version": "${{ steps.version.outputs.version }}",
+              "tag": "${{ github.ref_name }}",
+              "sha_darwin_arm64": "${{ env.SHA_DARWIN_ARM64 }}",
+              "sha_darwin_amd64": "${{ env.SHA_DARWIN_AMD64 }}",
+              "sha_linux_amd64": "${{ env.SHA_LINUX_AMD64 }}",
+              "sha_linux_arm64": "${{ env.SHA_LINUX_ARM64 }}"
+            }

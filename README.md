@@ -80,33 +80,67 @@ Every failure tells you **exactly** what to run to fix it.
 
 ## Installation
 
-### From source (Rust required)
+### Quick install (recommended)
 
 ```bash
-cargo install --path .
+curl -sSfL https://raw.githubusercontent.com/MadOrange4/vitals/main/install.sh | sh
 ```
 
-### From GitHub releases
-
-```bash
-# macOS ARM (Apple Silicon)
-curl -sSL https://github.com/MadOrange4/vitals/releases/latest/download/vitals-darwin-arm64 -o vitals
-chmod +x vitals && sudo mv vitals /usr/local/bin/
-
-# macOS Intel
-curl -sSL https://github.com/MadOrange4/vitals/releases/latest/download/vitals-darwin-amd64 -o vitals
-chmod +x vitals && sudo mv vitals /usr/local/bin/
-
-# Linux x86_64
-curl -sSL https://github.com/MadOrange4/vitals/releases/latest/download/vitals-linux-amd64 -o vitals
-chmod +x vitals && sudo mv vitals /usr/local/bin/
-```
-
-### Homebrew (via tap)
+### Homebrew (macOS & Linux)
 
 ```bash
 brew tap MadOrange4/tap
 brew install vitals
+```
+
+### Debian / Ubuntu (.deb)
+
+```bash
+# Download the latest .deb (amd64)
+curl -sSLO https://github.com/MadOrange4/vitals/releases/latest/download/vitals_0.1.0_amd64.deb
+sudo dpkg -i vitals_0.1.0_amd64.deb
+```
+
+### Fedora / RHEL / CentOS (.rpm)
+
+```bash
+# Download the latest .rpm (x86_64)
+curl -sSLO https://github.com/MadOrange4/vitals/releases/latest/download/vitals-0.1.0-1.x86_64.rpm
+sudo rpm -i vitals-0.1.0-1.x86_64.rpm
+```
+
+### Cargo (from crates.io)
+
+```bash
+cargo install vitals
+```
+
+### From source
+
+```bash
+git clone https://github.com/MadOrange4/vitals.git
+cd vitals
+cargo install --path .
+```
+
+### From GitHub releases (manual)
+
+```bash
+# macOS ARM (Apple Silicon)
+curl -sSfL https://github.com/MadOrange4/vitals/releases/latest/download/vitals-darwin-arm64.tar.gz | tar xz
+sudo mv vitals /usr/local/bin/
+
+# macOS Intel
+curl -sSfL https://github.com/MadOrange4/vitals/releases/latest/download/vitals-darwin-amd64.tar.gz | tar xz
+sudo mv vitals /usr/local/bin/
+
+# Linux x86_64
+curl -sSfL https://github.com/MadOrange4/vitals/releases/latest/download/vitals-linux-amd64.tar.gz | tar xz
+sudo mv vitals /usr/local/bin/
+
+# Linux ARM64
+curl -sSfL https://github.com/MadOrange4/vitals/releases/latest/download/vitals-linux-arm64.tar.gz | tar xz
+sudo mv vitals /usr/local/bin/
 ```
 
 ## Usage
