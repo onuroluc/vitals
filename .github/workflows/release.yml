@@ -97,11 +97,10 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          path: artifacts
           merge-multiple: true
 
       - name: List release assets
-        run: ls -lhR artifacts/ || ls -lh .
+        run: ls -lh
 
       - name: Create release
         uses: softprops/action-gh-release@v2
